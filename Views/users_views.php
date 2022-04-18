@@ -10,7 +10,7 @@
 </head>
 <body>
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
-  <link href="styles.css" rel="stylesheet">
+  <link href="/styles.css?v=0.1" rel="stylesheet">
   <div class="container">
     <div class="row flex-lg-nowrap">
       <div class="col">
@@ -75,7 +75,7 @@
           <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title">Add user</h5>
+                <h5 class="modal-title"></h5>
                 <button type="button" class="close" data-dismiss="modal">
                   <span aria-hidden="true">×</span>
                 </button>
@@ -123,7 +123,7 @@
                     </div>
                     <div class="row">
                       <div class="col d-flex justify-content-end">
-                        <button class="btn btn-primary" type="submit">Save</button>
+                        <button class="btn btn-primary" type="submit"></button>
                       </div>
                     </div>
                   </form>
@@ -160,9 +160,16 @@
         $('input:checkbox').prop('checked', this.checked)
     });
     $(".e-table").on("click", "input[id^='item-']", function(){
-        if(!this.checked) {
-            $('#all-items').prop('checked', this.checked)
-        }
+
+        var allCheckboxes = $(".e-table").find("input[id^='item-']");
+        var checked = true;
+        allCheckboxes.each(function (index, element){
+            if(!element.checked) {
+                checked = element.checked;
+                return false;
+            }
+        });
+        $('#all-items').prop('checked', checked)
     });
 
     $("#users_actions").on("submit", function(e){
@@ -271,6 +278,7 @@
 
     $('#user-form-modal').on('hide.bs.modal', function (event) {
         $("#user_form").trigger("reset");
+        $("#user_form input").attr("value", "");
     });
 
     $(".e-table").on("click", "button[id^='delete_user-']", function (e) {
@@ -305,6 +313,13 @@
 
         });
     });
+    $('#add-user').on("click", function (e) {
+        e.preventDefault();
+        var modal = $("#user-form-modal");
+        modal.find('button.btn-primary').text('Add');
+        modal.find('.modal-title').text("Add user");
+        modal.modal('show');
+    });
 
     $(".e-table").on("click", "button[id^='edit-user-']", function (e) {
         e.preventDefault();
@@ -328,6 +343,8 @@
             modal.find('input[name=last_name]').attr('value', data.user.last_name);
             modal.find('select[name=id_role] option[value='+data.user.id_role+']').prop('selected', true);
             modal.find('input[name=status]').prop('checked', (data.user.status === '1'));
+            modal.find('button.btn-primary').text('Save');
+            modal.find('.modal-title').text("Edit user");
             modal.modal('show');
             $(button).text('Edit');
         });
