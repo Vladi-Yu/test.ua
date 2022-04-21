@@ -68,6 +68,7 @@ class UsersController
     private function view()
     {
         $users = $this->db->getAllUsers();
+        
         $roles = $this->db->getAllRoles();
         include __DIR__ . '/../Views/users_views.php';
     }

@@ -55,7 +55,7 @@
                               <td class="text-center align-middle">
                                   <div class="btn-group align-top">
                                       <button class="btn btn-sm btn-outline-secondary badge" type="button" id="edit-user-<?= $user['id']; ?>"
-                                              data-user_id="<?= $user['id']; ?>">Edit</button>
+                                              data-user_id="<?= $user['id']; ?>" data-function="edit" data-toggle="modal" data-target="#user-form-modal">Edit</button>
                                       <button class="btn btn-sm btn-outline-secondary badge delete-user" id="delete_user-<?= $user['id']; ?>" type="button"><i class="fa fa-trash"></i></button>
                                   </div>
                               </td>
@@ -72,65 +72,50 @@
         </div>
         <!-- User Form Modal -->
         <div class="modal fade" role="dialog" tabindex="-1" id="user-form-modal">
-          <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title"></h5>
-                <button type="button" class="close" data-dismiss="modal">
-                  <span aria-hidden="true">×</span>
-                </button>
-              </div>
-              <div class="modal-body">
-                <div class="py-1">
-                  <form class="form" novalidate="" id="user_form">
-                      <input hidden type="text" name="id" value="">
-                    <div class="row">
-                      <div class="col">
-                        <div class="row align-items-center">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <h5 class="modal-title" id="exampleModalLabel">New message</h5>
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                          </button>
+                      </div>
+                      <div class="modal-body">
+                          <form class="form" novalidate="" id="user_form">
+                              <input hidden type="text" name="id" value="">
+                              <div class="form-group">
+                                  <label>First Name*</label>
+                                  <input class="form-control" type="text" name="first_name" placeholder="John" value="" required >
+                              </div>
+                              <div class="form-group">
+                                  <label>Last name*</label>
+                                  <input class="form-control" type="text" name="last_name" placeholder="Smith" value="" required >
+                              </div>
+                              <div class="form-group">
+                                  <label>Role*</label>
+                                  <select class="form-control" aria-label="Default select example" name="id_role" required>
+                                      <option selected disabled value="">Select role</option>
+                                      <?php foreach ($roles as $role) { ?>
+                                          <option value="<?=$role['id'];?>"><?=$role['name'];?></option>
+                                      <?php }; ?>
+                                  </select>
+                              </div>
+                              <div class="form-group">
+                                  <label class="checkbox-google mt-4">
+                                      <input type="checkbox" name="status">
+                                      <span class="checkbox-google-switch"></span>
+                                      <span class="ml-1">Status</span>
+                                  </label>
+                              </div>
+                          </form>
+                      </div>
+                      <div class="modal-footer">
+                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                          <button class="btn btn-primary" form="user_form" type="submit"></button>
+                      </div>
 
-                          <div class="col">
-                            <div class="form-group">
-                              <label>First Name*</label>
-                              <input class="form-control" type="text" name="first_name" placeholder="John" value="" required >
-                            </div>
-                          </div>
-                          <div class="col">
-                            <div class="form-group">
-                              <label>Last name*</label>
-                              <input class="form-control" type="text" name="last_name" placeholder="Smith" value="" required >
-                            </div>
-                          </div>
-                            <div class="col">
-                                <div class="form-group">
-                                    <label>Role*</label>
-                                    <select class="form-control" aria-label="Default select example" name="id_role" required>
-                                        <option selected disabled value="">Select role</option>
-                                        <?php foreach ($roles as $role) { ?>
-                                            <option value="<?=$role['id'];?>"><?=$role['name'];?></option>
-                                        <?php }; ?>
-                                    </select>
-                                </div>
-                            </div>
-                          <div class="col">
-                                    <label class="checkbox-google mt-4">
-                                        <input type="checkbox" name="status">
-                                        <span class="checkbox-google-switch"></span>
-                                        <span class="ml-1">Status</span>
-                                    </label>
-                            </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div class="row">
-                      <div class="col d-flex justify-content-end">
-                        <button class="btn btn-primary" type="submit"></button>
-                      </div>
-                    </div>
-                  </form>
-                </div>
+                  </div>
               </div>
-            </div>
-          </div>
         </div>
           <!-- Start Error modal -->
           <div class="modal" id="modal-alert" tabindex="-1" role="dialog">
@@ -227,7 +212,7 @@
                     };
                     modalError(modal);
                 }
-
+                $('.e-table tbody input:checked').prop('checked', false)
             })
 
         }).done(function(){
@@ -259,7 +244,7 @@
                 if(data.status){
                     var newUserRow = viewUser(data);
                     if(action === 'add') {
-                        $(newUserRow).prependTo( "table tbody")
+                        $("table tbody").append(newUserRow);
                     } else {
                         $("table tbody").find("tr[id^=user-row-"+user_id+"]").replaceWith($(newUserRow));
                     }
@@ -276,10 +261,19 @@
         });
     });
 
+    $('#user-form-modal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var operation = button.data('function');
+        operation = operation.charAt(0).toUpperCase() + operation.slice(1);
+        var modal = $(this);
+        modal.find('.modal-title').text(operation+' user');
+        modal.find('.modal-footer .btn-primary').text(operation)
+    })
     $('#user-form-modal').on('hide.bs.modal', function (event) {
         $("#user_form").trigger("reset");
-        $("#user_form input").attr("value", "");
+        $("#user_form input[type=text]").attr("value", "");
     });
+
 
     $(".e-table").on("click", "button[id^='delete_user-']", function (e) {
         e.preventDefault();
@@ -313,14 +307,6 @@
 
         });
     });
-    $('#add-user').on("click", function (e) {
-        e.preventDefault();
-        var modal = $("#user-form-modal");
-        modal.find('button.btn-primary').text('Add');
-        modal.find('.modal-title').text("Add user");
-        modal.modal('show');
-    });
-
     $(".e-table").on("click", "button[id^='edit-user-']", function (e) {
         e.preventDefault();
         $(this).text('Wait');
@@ -337,14 +323,12 @@
             dataType: 'json',
             data: $(this).serialize()
         }).done(function(data){
-            console.log(data.user);
+
             modal.find('input[name="id"]').attr('value', data.user.id);
             modal.find('input[name=first_name]').attr('value', data.user.first_name);
             modal.find('input[name=last_name]').attr('value', data.user.last_name);
             modal.find('select[name=id_role] option[value='+data.user.id_role+']').prop('selected', true);
             modal.find('input[name=status]').prop('checked', (data.user.status === '1'));
-            modal.find('button.btn-primary').text('Save');
-            modal.find('.modal-title').text("Edit user");
             modal.modal('show');
             $(button).text('Edit');
         });
@@ -360,14 +344,12 @@
             '</td>'+
             '<td class="text-nowrap align-middle">'+data.user.first_name+' '+data.user.last_name+'</td>'+
             '<td class="text-nowrap align-middle"><span>'+data.user.name_role+'</span></td>'+
-            '<td class="text-center align-middle"><i class="fa fa-circle '+(data.user.status ? 'active' : 'not-active')+'-circle"></i></td>'+
+            '<td class="text-center align-middle"><i class="fa fa-circle '+((data.user.status === '1') ? 'active' : 'not-active')+'-circle"></i></td>'+
            ' <td class="text-center align-middle">'+
                 '<div class="btn-group align-top">'+
                     '<button class="btn btn-sm btn-outline-secondary badge" type="button" id="edit-user-'+data.user.id+'"'+
-                            ' data-user_id="'+data.user.id+'">Edit</button>'+
-                    '<button class="btn btn-sm btn-outline-secondary badge delete-user" data-toggle="modal" data-target="#modal-alert"'+
-                            ' data-user_name = "'+ data.user.first_name+' '+data.user.last_name+'"'+
-                            ' data-user_id = "'+data.user.id+'" type="button"><i class="fa fa-trash"></i></button>'+
+                            ' data-user_id="'+data.user.id+'" data-function="edit" data-toggle="modal" data-target="#user-form-modal">Edit</button>'+
+                    '<button class="btn btn-sm btn-outline-secondary badge delete-user" id="delete_user-'+data.user.id+'" type="button"><i class="fa fa-trash"></i></button>'+
                 '</div></td></tr>';
     }
     function modalError(data) {

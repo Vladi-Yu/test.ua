@@ -1,5 +1,5 @@
 <div class="group-users-operation row m-0">
-    <button type="button" id="add-user" class="btn btn-primary col-1" data-toggle="modal" data-target="#user-form-modal">
+    <button type="button" id="add-user" class="btn btn-primary col-1" data-function="add" data-toggle="modal" data-target="#user-form-modal">
         <i class="fa fa-plus"></i> Add</button>
     <form class="row col-5" novalidate="" id="users_actions">
         <div class="input-group col-9">

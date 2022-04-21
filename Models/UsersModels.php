@@ -23,7 +23,7 @@ class UsersModels
 
     public function getAllUsers()
     {
-        $sql = 'SELECT `users`.*, `user_roles`.name as name_role FROM `users` LEFT JOIN `user_roles` ON `users`.id_role = `user_roles`.id';
+        $sql = 'SELECT `users`.*, `user_roles`.name as name_role FROM `users` LEFT JOIN `user_roles` ON `users`.id_role = `user_roles`.id  ORDER BY `users`.id ASC';
         return $this->SendRequestMysql($sql);
     }
     public function getAllRoles()
